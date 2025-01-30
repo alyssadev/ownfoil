@@ -6,6 +6,7 @@ from file_watcher import Watcher
 import threading
 import logging
 import sys
+import secrets
 import flask.cli
 flask.cli.show_server_banner = lambda *args: None
 from markupsafe import escape
@@ -24,9 +25,13 @@ def init():
     # Create and start the file watcher
     logger.info('Initializing File Watcher...')
     watcher = Watcher([], on_library_change)
+    # TODO add setting for disabling file watcher
+#    if False:
     watcher_thread = threading.Thread(target=watcher.run)
     watcher_thread.daemon = True
     watcher_thread.start()
+#    else:
+#        logger.info('File Watcher disabled by config')
 
     # load initial configuration
     logger.info('Loading initial configuration...')
@@ -41,8 +46,7 @@ os.makedirs(DATA_DIR, exist_ok=True)
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = OWNFOIL_DB
-# TODO: generate random secret_key
-app.config['SECRET_KEY'] = '8accb915665f11dfa15c2db1a4e8026905f57716'
+app.config['SECRET_KEY'] = secrets.token_hex(16)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 ## Global variables

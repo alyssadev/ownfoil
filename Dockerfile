@@ -1,28 +1,10 @@
 FROM python:3.11-alpine
 
-# Install platform-specific build dependencies
-ARG TARGETPLATFORM
-RUN apk update && apk add --no-cache bash sudo \
-    && if [ "$TARGETPLATFORM" = "linux/arm/v6" ] || [ "$TARGETPLATFORM" = "linux/arm/v7" ]; then \
-        apk add --no-cache build-base gcc musl-dev jpeg-dev zlib-dev libffi-dev cairo-dev pango-dev gdk-pixbuf-dev; \
-    fi
-
-RUN mkdir /app
-
-COPY ./app /app
-COPY ./docker/run.sh /app/run.sh
-
-COPY requirements.txt /tmp/
-
-RUN pip install --no-cache-dir --requirement /tmp/requirements.txt && rm /tmp/requirements.txt
-
-RUN if [ "$TARGETPLATFORM" = "linux/arm/v6" ] || [ "$TARGETPLATFORM" = "linux/arm/v7" ]; then \
-        apk del build-base gcc musl-dev jpeg-dev zlib-dev libffi-dev cairo-dev pango-dev gdk-pixbuf-dev; \
-    fi
-
-RUN mkdir -p /app/data
-
 WORKDIR /app
+
+COPY ./app/ .
+
+RUN apk add sudo && pip install --no-cache-dir flask==3.1.0 Flask-Login==0.6.3 flask-sqlalchemy==3.1.1 PyYAML==6.0.2 requests==2.32.3 unzip_http==0.6 watchdog==4.0.2 Werkzeug==3.1.3 nstools==1.2.0 zstandard==0.23.0 enlighten pycryptodome
 
 ENTRYPOINT [ "/app/run.sh" ]
 

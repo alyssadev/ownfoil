@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Retrieve from Environment variables, or use 1000 as default
 gid=${PGID:-1000}
